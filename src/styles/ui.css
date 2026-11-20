@@ -1,0 +1,778 @@
+/* ============================================================================
+ * 全局画布、首屏渐显加载遮罩、左上角黄铜航海罗盘 HUD 与右下角玻璃拟态控制栏样式
+ * ============================================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a1020;
+  touch-action: none;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  cursor: grab;
+}
+
+canvas:active {
+  cursor: grabbing;
+}
+
+/* --- 首屏渐显加载遮罩 --- */
+#agy-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: radial-gradient(circle at 50% 42%, #132038 0%, #070c18 72%);
+  color: #f6ead6;
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  transition: opacity 0.65s ease, visibility 0.65s ease;
+}
+
+#agy-loader.agy-loaded {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.agy-ld-ring {
+  width: 54px;
+  height: 54px;
+  color: #ffd07a;
+  animation: agySpin 5.5s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(255, 190, 92, 0.35));
+}
+
+@keyframes agySpin {
+  to { transform: rotate(360deg); }
+}
+
+.agy-ld-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #fcefd9;
+}
+
+.agy-ld-track {
+  width: 176px;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+#agy-load-bar {
+  width: 16%;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #e09132, #ffe09e);
+  transition: width 0.28s ease;
+}
+
+#agy-load-sub {
+  font-size: 12px;
+  color: rgba(242, 228, 206, 0.68);
+  letter-spacing: 0.05em;
+}
+
+/* --- 右下角控制栏 (.agy-dock) --- */
+.agy-dock {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right, 18px));
+  bottom: max(18px, env(safe-area-inset-bottom, 18px));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(10, 16, 28, 0.58);
+  border: 1px solid rgba(255, 214, 156, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.42);
+  transition: opacity 0.5s ease, transform 0.35s ease, border-color 0.35s ease;
+  opacity: 0.9;
+}
+
+.agy-dock.agy-idle,
+.agy-hud.agy-idle {
+  opacity: 0.26;
+}
+
+.agy-dock:hover,
+.agy-dock:focus-within,
+.agy-hud:hover,
+.agy-hud:focus-within {
+  opacity: 0.98 !important;
+  border-color: rgba(255, 214, 156, 0.44);
+}
+
+body.agy-ui-hidden .agy-dock,
+body.agy-ui-hidden .agy-hud {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(8px);
+}
+
+.agy-sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.16);
+  flex-shrink: 0;
+}
+
+.agy-btn {
+  position: relative;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(242, 232, 216, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 6px;
+  outline: none;
+  transition: all 0.22s ease;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.agy-btn svg {
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.agy-btn:hover {
+  color: #fff6e6;
+  background: rgba(255, 255, 255, 0.11);
+  transform: translateY(-1px);
+}
+
+.agy-btn:focus-visible {
+  border-color: rgba(255, 214, 156, 0.75);
+  box-shadow: 0 0 0 2px rgba(255, 198, 108, 0.32);
+}
+
+.agy-btn.agy-active {
+  color: #ffd07a;
+  background: rgba(255, 174, 66, 0.22);
+  border-color: rgba(255, 198, 108, 0.62);
+  box-shadow: 0 0 12px rgba(255, 166, 48, 0.34);
+}
+
+.agy-btn.agy-active-cyan {
+  color: #74f2ff;
+  background: rgba(36, 206, 235, 0.20);
+  border-color: rgba(96, 236, 255, 0.58);
+  box-shadow: 0 0 12px rgba(36, 216, 245, 0.34);
+}
+
+.agy-btn.agy-cooldown {
+  opacity: 0.45;
+}
+
+.agy-btn::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 11px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(8, 13, 24, 0.92);
+  border: 1px solid rgba(255, 214, 156, 0.28);
+  color: #f8efe0;
+  font: 500 12px/1.2 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.agy-btn:last-child::after {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+
+@media (hover: hover) {
+  .agy-btn:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .agy-btn:last-child:hover::after {
+    transform: translateY(0);
+  }
+}
+
+.agy-btn:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.agy-btn:last-child:focus-visible::after {
+  transform: translateY(0);
+}
+
+/* --- 左上角黄铜航海罗盘与遥测面板 (.agy-hud) --- */
+.agy-hud {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top, 16px));
+  left: max(18px, env(safe-area-inset-left, 18px));
+  max-width: calc(100vw - 32px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 10px;
+  border-radius: 18px;
+  background: rgba(10, 16, 28, 0.56);
+  border: 1px solid rgba(255, 214, 156, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.38);
+  color: #f6ebd8;
+  font: 500 12px/1.3 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  transition: opacity 0.5s ease, transform 0.35s ease, border-color 0.35s ease;
+  opacity: 0.9;
+}
+
+.agy-compass-wrap {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agy-compass-svg {
+  width: 38px;
+  height: 38px;
+  overflow: visible;
+}
+
+.agy-hud-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.agy-hud-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-variant-numeric: tabular-nums;
+  color: #fcefd9;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.agy-hud-dot {
+  color: rgba(255, 214, 156, 0.4);
+}
+
+.agy-hud-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.agy-mini-btn {
+  border: 1px solid rgba(255, 214, 156, 0.24);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 236, 216, 0.88);
+  border-radius: 99px;
+  padding: 1px 8px;
+  font: 500 11px/1.45 system-ui, -apple-system, "PingFang SC", sans-serif;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.agy-mini-btn:hover,
+.agy-mini-btn.agy-held {
+  background: rgba(255, 184, 77, 0.24);
+  border-color: rgba(255, 206, 120, 0.65);
+  color: #fff8ec;
+}
+
+.agy-steer-btn {
+  padding: 1px 6px;
+  font-weight: 700;
+}
+
+.agy-time-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 2px;
+}
+
+.agy-time-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 68px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 214, 156, 0.24);
+  outline: none;
+  cursor: pointer;
+}
+
+.agy-time-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ffd07a;
+  border: 1.5px solid #0a1020;
+  box-shadow: 0 0 6px rgba(255, 200, 108, 0.7);
+  cursor: pointer;
+}
+
+.agy-time-slider::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ffd07a;
+  border: 1.5px solid #0a1020;
+  cursor: pointer;
+}
+
+.agy-time-lbl {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(252, 239, 217, 0.85);
+  min-width: 34px;
+}
+
+/* --- 顶部居中轻量状态提示条 (.agy-toast) --- */
+.agy-toast {
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top, 18px));
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: 30;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(8, 14, 26, 0.86);
+  border: 1px solid rgba(255, 214, 156, 0.34);
+  color: #fcefd9;
+  font: 500 12.5px/1.3 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+  transition: opacity 0.24s ease, transform 0.24s ease;
+  white-space: nowrap;
+}
+
+.agy-toast.agy-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 640px) {
+  .agy-dock { gap: 3px; padding: 5px 7px; right: 10px; bottom: 12px; }
+  .agy-btn { width: 30px; height: 30px; padding: 5px; }
+  .agy-btn svg { width: 16px; height: 16px; }
+  .agy-hud { top: 10px; left: 10px; max-width: calc(100vw - 20px); padding: 6px 10px 6px 8px; gap: 7px; }
+  .agy-compass-wrap, .agy-compass-svg { width: 32px; height: 32px; }
+}
+
+/* ============================================================================
+ * v5 沉浸伴航 / 风暴炉火解压模式与船长室舷窗覆盖层样式
+ * ============================================================================ */
+
+body.agy-ambient-active .agy-dock,
+body.agy-ambient-active .agy-hud {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(10px);
+}
+
+.agy-mini-btn.agy-ambient-trigger {
+  background: rgba(255, 134, 42, 0.22);
+  border-color: rgba(255, 178, 92, 0.58);
+  color: #ffe0a8;
+  font-weight: 600;
+}
+
+.agy-mini-btn.agy-ambient-trigger:hover {
+  background: rgba(255, 134, 42, 0.38);
+  border-color: rgba(255, 206, 128, 0.85);
+  color: #fff8ec;
+}
+
+/* --- 船长室木框舷窗覆盖层（仅在 cabin 视角显示） --- */
+#agy-cabin-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.65s ease;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(0, 0, 0, 0) 46%, rgba(16, 8, 4, 0.58) 78%, rgba(8, 4, 2, 0.92) 100%);
+}
+
+body.agy-cabin-active #agy-cabin-frame {
+  opacity: 1;
+}
+
+.agy-cabin-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.agy-cabin-warmth {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 108%, rgba(255, 130, 38, 0.26) 0%, rgba(255, 108, 24, 0.08) 38%, rgba(0, 0, 0, 0) 68%);
+  animation: agyCabinFlicker 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes agyCabinFlicker {
+  0% { opacity: 0.72; }
+  35% { opacity: 0.96; }
+  70% { opacity: 0.82; }
+  100% { opacity: 1.0; }
+}
+
+/* --- 沉浸伴航底部极简悬浮条 --- */
+.agy-ambient-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: max(22px, env(safe-area-inset-bottom, 22px));
+  transform: translateX(-50%) translateY(18px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.4s ease;
+  max-width: calc(100vw - 24px);
+}
+
+body.agy-ambient-active .agy-ambient-wrap {
+  opacity: 0.95;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+body.agy-ambient-active .agy-ambient-wrap.agy-ambient-idle {
+  opacity: 0.16;
+}
+
+body.agy-ambient-active .agy-ambient-wrap:hover,
+body.agy-ambient-active .agy-ambient-wrap:focus-within {
+  opacity: 0.98 !important;
+}
+
+.agy-ambient-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(11, 14, 24, 0.68);
+  border: 1px solid rgba(255, 198, 128, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+  font: 500 12px/1.3 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #f6ead6;
+}
+
+.agy-amb-pill {
+  border: 1px solid rgba(255, 214, 156, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(246, 234, 214, 0.86);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font: 500 12px/1.25 system-ui, -apple-system, "PingFang SC", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.agy-amb-pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff9ef;
+}
+
+.agy-amb-pill.agy-amb-active {
+  background: rgba(255, 152, 56, 0.28);
+  border-color: rgba(255, 198, 118, 0.72);
+  color: #ffe2ad;
+  box-shadow: 0 0 12px rgba(255, 146, 48, 0.28);
+}
+
+.agy-amb-pill.agy-amb-active-ice {
+  background: rgba(92, 196, 255, 0.24);
+  border-color: rgba(142, 224, 255, 0.72);
+  color: #d6f4ff;
+  box-shadow: 0 0 12px rgba(92, 196, 255, 0.28);
+}
+
+.agy-amb-exit {
+  border-color: rgba(255, 142, 124, 0.35);
+  color: #ffc5bc;
+}
+
+.agy-amb-exit:hover {
+  background: rgba(235, 86, 72, 0.26);
+  border-color: rgba(255, 142, 124, 0.7);
+  color: #fff;
+}
+
+.agy-sleep-badge {
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: #ffd78c;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(255, 174, 66, 0.18);
+  border: 1px solid rgba(255, 198, 108, 0.35);
+  display: none;
+}
+
+.agy-sleep-badge.agy-visible {
+  display: inline-block;
+}
+
+/* --- 5 轨白噪音混音台与助眠定时弹窗 --- */
+.agy-mixer-panel {
+  width: min(360px, calc(100vw - 28px));
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(10, 14, 24, 0.84);
+  border: 1px solid rgba(255, 206, 138, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.56);
+  color: #f6ead6;
+  font: 500 12px/1.35 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.agy-mixer-panel.agy-open {
+  display: flex;
+}
+
+.agy-mixer-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffe0a8;
+  letter-spacing: 0.04em;
+}
+
+.agy-mixer-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 34px;
+  align-items: center;
+  gap: 10px;
+}
+
+.agy-mixer-row label {
+  color: rgba(246, 234, 214, 0.88);
+  font-size: 12px;
+}
+
+.agy-mixer-row input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 214, 156, 0.22);
+  outline: none;
+  cursor: pointer;
+}
+
+.agy-mixer-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffd07a;
+  border: 1px solid #3a2208;
+  box-shadow: 0 0 8px rgba(255, 184, 72, 0.55);
+}
+
+.agy-mixer-val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: rgba(255, 224, 168, 0.78);
+}
+
+.agy-sleep-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 214, 156, 0.16);
+}
+
+.agy-sleep-btns {
+  display: flex;
+  gap: 5px;
+}
+
+.agy-sleep-btn {
+  border: 1px solid rgba(255, 214, 156, 0.24);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(246, 234, 214, 0.85);
+  border-radius: 99px;
+  padding: 3px 9px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.agy-sleep-btn:hover,
+.agy-sleep-btn.agy-active {
+  background: rgba(255, 174, 66, 0.28);
+  border-color: rgba(255, 206, 120, 0.72);
+  color: #fff6e6;
+}
+
+/* ============================================================================
+ * v5.1 全端响应式与触控设备深度适配（手机竖屏 / 窄分栏 / 车机矮宽屏 / 无悬停触控）
+ * ============================================================================ */
+
+@media (hover: none) {
+  .agy-btn::after {
+    display: none !important;
+  }
+}
+
+@media (max-width: 960px) {
+  .agy-hud {
+    max-width: calc(100vw - 24px);
+    padding: 7px 11px 7px 8px;
+    gap: 8px;
+  }
+  .agy-dock {
+    max-width: calc(100vw - 24px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .agy-dock::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .agy-hud {
+    top: max(10px, env(safe-area-inset-top, 10px));
+    left: max(10px, env(safe-area-inset-left, 10px));
+    max-width: calc(100vw - 20px);
+    border-radius: 14px;
+    padding: 6px 10px 6px 8px;
+    gap: 7px;
+  }
+  .agy-compass-wrap,
+  .agy-compass-svg {
+    width: 30px;
+    height: 30px;
+  }
+  .agy-hud-metrics {
+    font-size: 11px;
+    gap: 3px 5px;
+  }
+  .agy-mini-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+    min-height: 26px;
+  }
+  .agy-dock {
+    right: 50%;
+    transform: translateX(50%);
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    max-width: calc(100vw - 16px);
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  .agy-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .agy-ambient-wrap {
+    bottom: max(14px, env(safe-area-inset-bottom, 14px));
+    max-width: calc(100vw - 16px);
+  }
+  .agy-ambient-bar {
+    border-radius: 20px;
+    padding: 7px 9px;
+    gap: 5px;
+  }
+  .agy-amb-pill {
+    padding: 6px 10px;
+    font-size: 11.5px;
+  }
+  .agy-mixer-panel {
+    width: calc(100vw - 20px);
+    padding: 12px 14px;
+  }
+}
+
+@media (max-height: 520px) {
+  .agy-hud {
+    top: 8px;
+    left: 10px;
+    padding: 5px 10px 5px 8px;
+  }
+  .agy-dock {
+    bottom: 8px;
+    right: 10px;
+    padding: 5px 7px;
+  }
+  .agy-ambient-wrap {
+    bottom: 10px;
+  }
+}

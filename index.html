@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>远洋古帆船 — 3D 交互海景模拟</title>
+  <link rel="stylesheet" href="./src/styles/ui.css">
+  <!-- 支持零构建本地静态服务器直接运行（Vite 构建时会自动接管裸模块导入） -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- 首屏渐显海图罗盘加载遮罩 -->
+  <div id="agy-loader" aria-live="polite">
+    <svg class="agy-ld-ring" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="24" cy="24" r="20" stroke-opacity="0.32"/>
+      <circle cx="24" cy="24" r="15" stroke-dasharray="4 4" stroke-opacity="0.55"/>
+      <polygon points="24,5 27.5,20.5 24,24 20.5,20.5" fill="currentColor" stroke="none"/>
+      <polygon points="24,43 27.5,27.5 24,24 20.5,27.5" fill="currentColor" fill-opacity="0.38" stroke="none"/>
+      <polygon points="5,24 20.5,20.5 24,24 20.5,27.5" fill="currentColor" fill-opacity="0.38" stroke="none"/>
+      <polygon points="43,24 27.5,20.5 24,24 27.5,27.5" fill="currentColor" fill-opacity="0.38" stroke="none"/>
+    </svg>
+    <div class="agy-ld-title">远洋古帆船</div>
+    <div class="agy-ld-track"><div id="agy-load-bar"></div></div>
+    <div id="agy-load-sub">正在铺展海图与索具…</div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
